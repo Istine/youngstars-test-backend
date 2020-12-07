@@ -73,7 +73,7 @@ const check_user_details = async (username, password) => {
     });
     return user_check;
   } catch (err) {
-      return []
+    return [];
   }
 };
 
@@ -135,8 +135,7 @@ const add_subscription = async (request, subscription) => {
       },
     }
   );
-  console.log(update)
-  console.log("Boolean: ",update.nModified == 1)
+
   if (update.nModified == 1) {
     return {
       success: true,
@@ -147,6 +146,34 @@ const add_subscription = async (request, subscription) => {
       success: false,
       update,
     };
+  }
+};
+
+//get user channels
+const get_user_channels = async (username) => {
+  try {
+    //get users by email from db
+    const channels = await Users.find({
+      email: username,
+    });
+    console.log(username)
+    if(channels.length > 0) {
+       return {
+            channels:channels.subscriptions,
+            code:200
+        }
+    }
+    else {
+        return {
+            code:404,
+            channels
+        }
+    }
+  } catch (error) {
+      return {
+          error,
+          code:500
+      }
   }
 };
 
@@ -162,4 +189,5 @@ module.exports = {
   fetch_all_channels,
   validate_subscription_choice,
   add_subscription,
+  get_user_channels
 };

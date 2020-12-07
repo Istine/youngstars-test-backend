@@ -5,6 +5,7 @@ const {
   json_success_response,
   validate_subscription_choice,
   add_subscription,
+  get_user_channels,
 } = require("./helpers");
 
 // middleware to authorize users
@@ -60,8 +61,28 @@ const subscribe_to_channel = async (req, res) => {
   }
 };
 
+//get channels for specific user
+const fetch_my_channels = async (req,res) => {
+    try {
+        const username = req.params["username"]
+        // console.log(req.params)
+        const response = await get_user_channels(username)
+        if(response.error) {
+           json_error_response(res, response.error, response.code)
+           return 
+        }
+
+        json_success_response(res, "success", response.channels,response.code)
+        return
+    } catch (error) {
+        json_error_response(res, error.message, 500)
+        return
+    }
+}
+
 module.exports = {
   authorize_client,
   get_all_channels,
   subscribe_to_channel,
+  fetch_my_channels
 };
