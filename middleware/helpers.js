@@ -2,6 +2,7 @@ const Users = require("../model/Users"); // Users model
 const crypto = require("crypto"); // crypto module for hashing password
 
 const JWT = require("jsonwebtoken"); // jwt module import
+const Channels = require("../model/Channels");
 
 //fields validator function
 const validate_fields = (email, password) => {
@@ -82,18 +83,25 @@ const create_token = (username) => {
 
 const verify_token = (request) => {
   try {
-    const headers = req.headers["Authorization"];
-    const token = headers.split(" ")[1];
-    const decoded = JWT.verify(token, "youngstars")
+    const headers = request.header["Authorization"];
+    const token = request.headers.authorization.split(" ")[1];
+    const decoded = JWT.verify(token, "youngstars");
     return {
-        decoded:docoded.email
+        decoded,
+        code:200
     }
   } catch (error) {
       return {
-          error
+          error:error.message,
+          code:400
       }
   }
 };
+
+const fetch_all_channels = async () => {
+    const all_channels = await Channels.find()
+    return all_channels
+}
 
 //exporting functions
 module.exports = {
@@ -103,5 +111,6 @@ module.exports = {
   createUser,
   check_user_details,
   create_token,
-  verify_token
+  verify_token,
+  fetch_all_channels
 };

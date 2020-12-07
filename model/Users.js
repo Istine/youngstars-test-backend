@@ -16,6 +16,13 @@ const user_schema = new USER_SCHEMA({
         trim: true,
         minlength: 7
     },
+
+    subscriptions: {
+        type:Array,
+        required:false,
+        unique:false,
+        trim:true,
+    }
 })
 
 const Users = mongoose.model("Users", user_schema)
