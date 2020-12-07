@@ -10,6 +10,8 @@ app.get("/", (req, res) => {
     })
 })
 
+app.use(express.json())
+app.use(express.urlencoded({extended:false}))
 
 // server listening on port 
 app.listen(PORT,() => console.log("Sever running on port" + PORT))
