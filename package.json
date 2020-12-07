@@ -1,0 +1,19 @@
+{
+  "name": "youngstars-test-backend",
+  "version": "1.0.0",
+  "description": "server for a test app for youngstars",
+  "main": "app.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Istine/youngstars-test-backend.git"
+  },
+  "author": "Imanche Sabastine",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/Istine/youngstars-test-backend/issues"
+  },
+  "homepage": "https://github.com/Istine/youngstars-test-backend#readme"
+}
