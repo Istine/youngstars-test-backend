@@ -4,6 +4,7 @@
   "description": "server for a test app for youngstars",
   "main": "app.js",
   "scripts": {
+    "dev":"nodemon app",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {
@@ -15,5 +16,11 @@
   "bugs": {
     "url": "https://github.com/Istine/youngstars-test-backend/issues"
   },
-  "homepage": "https://github.com/Istine/youngstars-test-backend#readme"
+  "homepage": "https://github.com/Istine/youngstars-test-backend#readme",
+  "dependencies": {
+    "express": "^4.17.1"
+  },
+  "devDependencies": {
+    "nodemon": "^2.0.6"
+  }
 }
