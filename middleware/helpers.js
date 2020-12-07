@@ -66,42 +66,89 @@ const create_password_hash = (password) => {
 
 //function to check for user details in the database
 const check_user_details = async (username, password) => {
-  const user_check = await Users.find({
-    email: username,
-    password: create_password_hash(password),
-  });
-  return user_check;
+  try {
+    const user_check = await Users.find({
+      email: username,
+      password: create_password_hash(password),
+    });
+    return user_check;
+  } catch (err) {
+      return []
+  }
 };
 
 //jwt token create function
 const create_token = (username) => {
   const token = JWT.sign({ username }, "youngstars", {
-    expiresIn: 20,
+    expiresIn: "1h",
   });
   return token;
 };
 
+//token verification
 const verify_token = (request) => {
   try {
-    const headers = request.header["Authorization"];
     const token = request.headers.authorization.split(" ")[1];
     const decoded = JWT.verify(token, "youngstars");
     return {
-        decoded,
-        code:200
-    }
+      decoded,
+      code: 200,
+    };
   } catch (error) {
-      return {
-          error:error.message,
-          code:400
-      }
+    return {
+      error: error.message,
+      code: 400,
+    };
   }
 };
 
+//get all channels
 const fetch_all_channels = async () => {
-    const all_channels = await Channels.find()
-    return all_channels
-}
+  const all_channels = await Channels.find();
+  return all_channels;
+};
+
+//validate subscription choice
+const validate_subscription_choice = (choice) => {
+  switch (choice) {
+    case "Dog":
+      return true;
+    case "Cat":
+      return true;
+    case "Goat":
+      return true;
+    default:
+      return false;
+  }
+};
+
+//add subscription to user subscriptions
+const add_subscription = async (request, subscription) => {
+  const email = request.email;
+  const update = await Users.updateOne(
+    {
+      email,
+    },
+    {
+      $push: {
+        subscriptions: subscription,
+      },
+    }
+  );
+  console.log(update)
+  console.log("Boolean: ",update.nModified == 1)
+  if (update.nModified == 1) {
+    return {
+      success: true,
+      update,
+    };
+  } else {
+    return {
+      success: false,
+      update,
+    };
+  }
+};
 
 //exporting functions
 module.exports = {
@@ -112,5 +159,7 @@ module.exports = {
   check_user_details,
   create_token,
   verify_token,
-  fetch_all_channels
+  fetch_all_channels,
+  validate_subscription_choice,
+  add_subscription,
 };

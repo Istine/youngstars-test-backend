@@ -13,6 +13,7 @@ const authenticate_user = async (req, res, next) => {
     const data = validate_fields(username, password);
     if (data.error) {
       json_error_response(res, data.error, data.code);
+      return
     }
 
     const response = await check_user_details(username, password);
@@ -22,11 +23,14 @@ const authenticate_user = async (req, res, next) => {
             token
         }
         json_success_response(res, "Login success", data, 200)
+        return
     }
 
     json_error_response(res, "User not found", 404)
+    return
   } catch (error) {
       json_error_response(res, error.message, 500)
+      return
   }
 };
 

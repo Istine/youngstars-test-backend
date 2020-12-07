@@ -24,6 +24,7 @@ const create_new_user = async (req, res) => {
     //  call function to create user in database
   } catch (error) {
     json_error_response(res, error.message, 500);
+    return
   }
 };
 
