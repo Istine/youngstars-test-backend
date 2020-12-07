@@ -1,7 +1,11 @@
-const Users = require("../model/Users");
-const crypto = require("crypto");
+const Users = require("../model/Users"); // Users model
+const crypto = require("crypto"); // crypto module for hashing password
 
+const JWT = require("jsonwebtoken"); // jwt module import
+
+//fields validator function
 const validate_fields = (email, password) => {
+  //regex for validating input
   const regex = /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
   const errors = [];
   if (!email) {
@@ -16,7 +20,7 @@ const validate_fields = (email, password) => {
   if (errors.length === 0) {
     return {
       email,
-      password: create_password_hash(password),
+      password: password,
     };
   } else {
     return {
@@ -43,10 +47,11 @@ const json_error_response = (response, message, code) => {
 
 // helper function for creating a new user
 const createUser = async (email, password) => {
-  const results = {};
+  const response = await check_user_details(email, password);
+
   const user = new Users({
     email,
-    password,
+    password: create_password_hash(password),
   });
   const data = await user.save();
   return data;
@@ -58,12 +63,36 @@ const create_password_hash = (password) => {
   return hash;
 };
 
+//function to check for user details in the database
 const check_user_details = async (username, password) => {
   const user_check = await Users.find({
     email: username,
     password: create_password_hash(password),
   });
   return user_check;
+};
+
+//jwt token create function
+const create_token = (username) => {
+  const token = JWT.sign({ username }, "youngstars", {
+    expiresIn: 20,
+  });
+  return token;
+};
+
+const verify_token = (request) => {
+  try {
+    const headers = req.headers["Authorization"];
+    const token = headers.split(" ")[1];
+    const decoded = JWT.verify(token, "youngstars")
+    return {
+        decoded:docoded.email
+    }
+  } catch (error) {
+      return {
+          error
+      }
+  }
 };
 
 //exporting functions
@@ -73,4 +102,6 @@ module.exports = {
   json_success_response,
   createUser,
   check_user_details,
+  create_token,
+  verify_token
 };

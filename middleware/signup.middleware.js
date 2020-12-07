@@ -15,9 +15,8 @@ const create_new_user = async (req, res) => {
       return json_error_response(res, data.error, data.code);
     }
     const response =  await createUser(data.email, data.password);
-    console.log(response)
     if (!response) {
-      return json_error_response(res, "Failed to create user.", 400);
+      return json_error_response(res, "User already exists.", 400);
     }
 
     return json_success_response(res, "Successfully created user", null, 201);

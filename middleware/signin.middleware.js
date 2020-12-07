@@ -3,6 +3,7 @@ const {
   json_error_response,
   check_user_details,
   json_success_response,
+  create_token
 } = require("./helpers");
 
 // middleware for authenticating user
@@ -16,7 +17,11 @@ const authenticate_user = async (req, res, next) => {
 
     const response = await check_user_details(username, password);
     if(response.length > 0) {
-        json_success_response(res, "Login success", response, 200)
+        const token = create_token(username)
+        const data = {
+            token
+        }
+        json_success_response(res, "Login success", data, 200)
     }
 
     json_error_response(res, "User not found", 404)
