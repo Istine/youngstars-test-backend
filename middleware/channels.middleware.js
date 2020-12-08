@@ -42,7 +42,7 @@ const subscribe_to_channel = async (req, res) => {
     if (!response) {
       json_error_response(
         res,
-        "Please give an choice between " + ["Dog", "Cat", "Goat"],
+        "Please choose a channel between " + ["Dog", "Cat", "Goat"],
         400
       );
       return
@@ -52,7 +52,7 @@ const subscribe_to_channel = async (req, res) => {
       json_error_response(res, data.update, 500);
       return
     } else {
-      json_success_response(res, "Success", "success", 201);
+      json_success_response(res, "success", "success", 201);
       return
     }
   } catch (error) {
@@ -65,7 +65,6 @@ const subscribe_to_channel = async (req, res) => {
 const fetch_my_channels = async (req,res) => {
     try {
         const username = req.query["username"]
-        // console.log(req.params)
         const response = await get_user_channels(username)
         if(response.error) {
            json_error_response(res, response.error, response.code)
