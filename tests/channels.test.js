@@ -79,7 +79,16 @@ const add_subscription_mock = (user, channel) => {
 //test for successful request
 test("should return a success message object", async () => {
   const choices = ["Dog", "Cat", "Goat"];
+  const acceptableFormats = ["application/json"]; //content-type mock
   mockAxios.put.mockImplementationOnce((url, body, config) => {
+    //content type header check
+    const content_type = config.headers;
+    if (acceptableFormats[0] !== content_type["content-type"]) {
+     return Promise.resolve({
+        error_message: "unacceptable content-type",
+      });
+    }
+
     const { subscribe_to } = body; // get choice
     //validate sunscription choice
     const validated_response = validate_subscription_choice(subscribe_to);
@@ -96,9 +105,9 @@ test("should return a success message object", async () => {
     if (!data.success) {
       //return error object
       return {
-          message:"error encountered",
-          data:[]
-      }
+        message: "error encountered",
+        data: [],
+      };
     }
     // return success object
     return {
@@ -108,13 +117,22 @@ test("should return a success message object", async () => {
   });
 
   const data = await methods.subscribe_to_channel();
-  expect(data.message).toBe("success")
+  expect(data.message).toBe("success");
 });
 
 //test for failed request
-test('should return an error object ',async () => {
+test("should return an error object ", async () => {
   const choices = ["Dog", "Cat", "Goat"];
+  const acceptableFormats = ["application/json"]; //content-type mock
   mockAxios.put.mockImplementationOnce((url, body, config) => {
+    //content type header check
+    const content_type = config.headers;
+    if (acceptableFormats[0] !== content_type["content-type"]) {
+      return Promise.resolve({
+        error_message: "unacceptable content-type",
+      });
+    }
+
     const { subscribe_to } = body; // get choice
     //validate sunscription choice
     const validated_response = validate_subscription_choice(subscribe_to);
@@ -130,9 +148,9 @@ test('should return an error object ',async () => {
     if (!data.success) {
       //return error object
       return {
-          message:"error encountered",
-          data:[]
-      }
+        message: "error encountered",
+        data: [],
+      };
     }
     // return success object
     return {
@@ -142,6 +160,5 @@ test('should return an error object ',async () => {
   });
 
   const data = await methods.subscribe_to_channel_fail();
-  expect(data.message).toBe("error encountered")
-  
-})
+  expect(data.message).toBe("error encountered");
+});
