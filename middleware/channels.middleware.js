@@ -64,7 +64,7 @@ const subscribe_to_channel = async (req, res) => {
 //get channels for specific user
 const fetch_my_channels = async (req,res) => {
     try {
-        const username = req.params["username"]
+        const username = req.query["username"]
         // console.log(req.params)
         const response = await get_user_channels(username)
         if(response.error) {

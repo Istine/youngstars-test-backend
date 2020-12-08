@@ -156,10 +156,9 @@ const get_user_channels = async (username) => {
     const channels = await Users.find({
       email: username,
     });
-    console.log(username)
     if(channels.length > 0) {
        return {
-            channels:channels.subscriptions,
+            channels:channels[0].subscriptions,
             code:200
         }
     }
