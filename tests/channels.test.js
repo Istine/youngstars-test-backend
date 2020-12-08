@@ -1,3 +1,5 @@
+require("dotenv").config()
+
 const BASE_URL = "http://localhost:8000";
 const {
   validate_subscription_choice,
@@ -5,11 +7,31 @@ const {
   add_subscription,
 } = require("../middleware/helpers");
 const mockAxios = require("./axios"); // get axios mock object
+
+const mongoose = require("mongoose");
+const databaseName = "Pet_assist";
+
+beforeAll(async () => {
+  await mongoose.connect(process.env.URI, {
+    dbName: databaseName,
+    user: process.env.URI_USERNAME,
+    pass: process.env.URI_PASSWORD,
+    useNewUrlParser: true,
+    useCreateIndex: true,
+    useUnifiedTopology: true,
+  });
+
+  const connection = mongoose.connection;
+  connection.once("open", () => console.log("MongoDB connection established test..."));
+});
+
 const methods = {
   subscribe_to_channel: async () => {
     try {
       const response = await mockAxios.put(
-        `${BASE_URL}/channels?${JSON.stringify({ username: "user1" })}`,
+        `${BASE_URL}/channels?${JSON.stringify({
+          email: "user@petsassist.com",
+        })}`,
         {
           subscribe_to: "Cat",
         },
@@ -29,7 +51,7 @@ const methods = {
       const response = await mockAxios.put(
         `${BASE_URL}/channels?${JSON.stringify({ username: "user" })}`,
         {
-          subscribe_to: "Cat",
+          subscribe_to: "Goat",
         },
         {
           headers: {
@@ -78,54 +100,67 @@ const add_subscription_mock = (user, channel) => {
 
 //test for successful request
 test("should return a success message object", async () => {
-  const choices = ["Dog", "Cat", "Goat"];
-  const acceptableFormats = ["application/json"]; //content-type mock
-  mockAxios.put.mockImplementationOnce((url, body, config) => {
-    //content type header check
-    const content_type = config.headers;
-    if (acceptableFormats[0] !== content_type["content-type"]) {
-     return Promise.resolve({
-        error_message: "unacceptable content-type",
-      });
-    }
+  
+    const choices = ["Dog", "Cat", "Goat"];
+    const acceptableFormats = ["application/json"]; //content-type mock
+    mockAxios.put.mockImplementationOnce(async (url, body, config) => {
+      //content type header check
+      try {
+      const content_type = config.headers;
+      if (acceptableFormats[0] !== content_type["content-type"]) {
+        return Promise.resolve({
+          error_message: "unacceptable content-type",
+        });
+      }
 
-    const { subscribe_to } = body; // get choice
-    //validate sunscription choice
-    const validated_response = validate_subscription_choice(subscribe_to);
-    if (!validated_response) {
-      return Promise.resolve({
-        message: `Please choose a channel between ${choices}`,
-        code: 400,
-      });
-    }
+      const { subscribe_to } = body; // get choice
+      //validate sunscription choice
+      const validated_response = validate_subscription_choice(subscribe_to);
+      if (!validated_response) {
+        return Promise.resolve({
+          message: `Please choose a channel between ${choices}`,
+          code: 400,
+        });
+      }
 
-    //add channel to subscriptions list
-    const data = add_subscription_mock(getParams(url).username, subscribe_to);
-    // check if the mock request was successfull
-    if (!data.success) {
-      //return error object
+      //add channel to subscriptions list
+      const data = await add_subscription(
+        getParams(url),
+        subscribe_to
+      );
+      // check if the mock request was successfull
+      if (!data.success) {
+        //return error object
+        return {
+          message: "error encountered",
+          data: [],
+        };
+      }
+      // return success object
       return {
-        message: "error encountered",
-        data: [],
+        message: "success",
+        data: data.update,
       };
     }
-    // return success object
-    return {
-      message: "success",
-      data: data.update,
-    };
-  });
+    catch(err){
+      return Promise.resolve({
+        error
+      })
+    }
+    });
 
   const data = await methods.subscribe_to_channel();
   expect(data.message).toBe("success");
 });
 
-//test for failed request
-test("should return an error object ", async () => {
+//test for failed update
+test("should return a success message object", async () => {
+  
   const choices = ["Dog", "Cat", "Goat"];
   const acceptableFormats = ["application/json"]; //content-type mock
-  mockAxios.put.mockImplementationOnce((url, body, config) => {
+  mockAxios.put.mockImplementationOnce(async (url, body, config) => {
     //content type header check
+    try {
     const content_type = config.headers;
     if (acceptableFormats[0] !== content_type["content-type"]) {
       return Promise.resolve({
@@ -142,8 +177,12 @@ test("should return an error object ", async () => {
         code: 400,
       });
     }
+
     //add channel to subscriptions list
-    const data = add_subscription_mock(getParams(url).username, subscribe_to);
+    const data = await add_subscription(
+      getParams(url),
+      subscribe_to
+    );
     // check if the mock request was successfull
     if (!data.success) {
       //return error object
@@ -157,8 +196,14 @@ test("should return an error object ", async () => {
       message: "success",
       data: data.update,
     };
+  }
+  catch(err){
+    return Promise.resolve({
+      error
+    })
+  }
   });
 
-  const data = await methods.subscribe_to_channel_fail();
-  expect(data.message).toBe("error encountered");
+const data = await methods.subscribe_to_channel_fail();
+expect(data.message).toBe("error encountered");
 });

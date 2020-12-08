@@ -6,7 +6,11 @@
   "scripts": {
     "start": "node app",
     "dev": "nodemon app",
-    "test":"jest"
+    "test":"jest --detectOpenHandles"
+
+  },
+  "jest": {
+    "testEnvironment": "node"
   },
   "repository": {
     "type": "git",

@@ -52,7 +52,7 @@ const subscribe_to_channel = async (req, res) => {
       json_error_response(res, data.update, 500);
       return
     } else {
-      json_success_response(res, "success", "success", 201);
+      json_success_response(res, "success", data.update, 201);
       return
     }
   } catch (error) {
