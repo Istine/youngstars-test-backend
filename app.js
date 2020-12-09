@@ -29,12 +29,12 @@ const corsOptions = (req, callback) => {
 
 
 //connect to atlas
-const URI = process.env.URI;
+const URI = "mongodb+srv://cluster0.ur9gu.mongodb.net/?retryWrites=true&w=majority";
 //connect to mongodb Atlas
 mongoose.connect(URI, {
 dbName:"Pet_assist",
-user:process.env.URI_USERNAME,
-pass:process.env.URI_PASSWORD,
+user:"youngstars",
+pass:"F7EdjaKzFb5cOEJh",
   useNewUrlParser: true,
   useCreateIndex: true,
   useUnifiedTopology: true,

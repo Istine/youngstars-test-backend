@@ -3,7 +3,6 @@ require("dotenv").config()
 const BASE_URL = "http://localhost:8000";
 const {
   validate_subscription_choice,
-  json_error_response,
   add_subscription,
 } = require("../middleware/helpers");
 const mockAxios = require("./axios"); // get axios mock object
@@ -11,11 +10,15 @@ const mockAxios = require("./axios"); // get axios mock object
 const mongoose = require("mongoose");
 const databaseName = "Pet_assist";
 
+//connect to atlas
+const URI = "mongodb+srv://cluster0.ur9gu.mongodb.net/?retryWrites=true&w=majority";
+//connect to mongodb Atlas
+
 beforeAll(async () => {
-  await mongoose.connect(process.env.URI, {
+  await mongoose.connect(URI, {
     dbName: databaseName,
-    user: process.env.URI_USERNAME,
-    pass: process.env.URI_PASSWORD,
+    user: "youngstars",
+    pass: "F7EdjaKzFb5cOEJh",
     useNewUrlParser: true,
     useCreateIndex: true,
     useUnifiedTopology: true,
