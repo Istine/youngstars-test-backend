@@ -122,30 +122,58 @@ const validate_subscription_choice = (choice) => {
   }
 };
 
+
 //add subscription to user subscriptions
 const add_subscription = async (request, subscription) => {
   const email = request.email;
-  const update = await Users.updateOne(
-    {
-      email,
-    },
-    {
-      $push: {
-        subscriptions: subscription,
+  if (typeof subscription === "object") {
+    const update = await Users.updateOne(
+      {
+        email,
       },
-    }
-  );
+      {
+        $addToSet: {
+          subscriptions: {
+            $each: [...subscription],
+          },
+        },
+      }
+    );
 
-  if (update.nModified == 1) {
-    return {
-      success: true,
-      update,
-    };
+    if (update.nModified == 1) {
+      return {
+        success: true,
+        update,
+      };
+    } else {
+      return {
+        success: false,
+        update,
+      };
+    }
   } else {
-    return {
-      success: false,
-      update,
-    };
+    const update = await Users.updateOne(
+      {
+        email,
+      },
+      {
+        $addToSet: {
+          subscriptions: subscription,
+        },
+      }
+    );
+
+    if (update.nModified == 1) {
+      return {
+        success: true,
+        update,
+      };
+    } else {
+      return {
+        success: false,
+        update,
+      };
+    }
   }
 };
 
@@ -156,23 +184,22 @@ const get_user_channels = async (username) => {
     const channels = await Users.find({
       email: username,
     });
-    if(channels.length > 0) {
-       return {
-            channels:channels[0].subscriptions,
-            code:200
-        }
-    }
-    else {
-        return {
-            code:404,
-            channels
-        }
+    if (channels.length > 0) {
+      return {
+        channels: channels[0].subscriptions,
+        code: 200,
+      };
+    } else {
+      return {
+        code: 404,
+        channels,
+      };
     }
   } catch (error) {
-      return {
-          error,
-          code:500
-      }
+    return {
+      error,
+      code: 500,
+    };
   }
 };
 
@@ -188,5 +215,5 @@ module.exports = {
   fetch_all_channels,
   validate_subscription_choice,
   add_subscription,
-  get_user_channels
+  get_user_channels,
 };

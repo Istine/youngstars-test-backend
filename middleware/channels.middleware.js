@@ -6,6 +6,7 @@ const {
   validate_subscription_choice,
   add_subscription,
   get_user_channels,
+  add_subscription_array,
 } = require("./helpers");
 
 // middleware to authorize users
@@ -38,7 +39,10 @@ const get_all_channels = async (req, res) => {
 const subscribe_to_channel = async (req, res) => {
   try {
     const { subscribe_to } = req.body; // get subscription choice
-    const response = validate_subscription_choice(subscribe_to);
+    let response = subscribe_to;
+    if(typeof subscribe_to !== "object")  {
+     response = validate_subscription_choice(subscribe_to);
+    }
     if (!response) {
       json_error_response(
         res,

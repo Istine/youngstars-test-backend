@@ -9,6 +9,7 @@ const {
 const create_new_user = async (req, res) => {
   try {
     const { username, password } = req.body; // get username and password from request body
+    console.log(username, password,  "Here")
     //validate the username and password
     const data = validate_fields(username, password);
     if (data.error) {

@@ -26,7 +26,7 @@ const authenticate_user = async (req, res, next) => {
         return
     }
 
-    json_error_response(res, "User not found", 404)
+    json_error_response(res, ["Invalid username or password"], 404)
     return
   } catch (error) {
       json_error_response(res, error.message, 500)
