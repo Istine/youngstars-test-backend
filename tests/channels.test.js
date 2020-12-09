@@ -3,6 +3,7 @@ require("dotenv").config()
 const BASE_URL = "http://localhost:8000";
 const {
   validate_subscription_choice,
+  json_error_response,
   add_subscription,
 } = require("../middleware/helpers");
 const mockAxios = require("./axios"); // get axios mock object
@@ -10,30 +11,12 @@ const mockAxios = require("./axios"); // get axios mock object
 const mongoose = require("mongoose");
 const databaseName = "Pet_assist";
 
-//connect to atlas
-const URI = "mongodb+srv://cluster0.ur9gu.mongodb.net/?retryWrites=true&w=majority";
-//connect to mongodb Atlas
-
-beforeAll(async () => {
-  await mongoose.connect(URI, {
-    dbName: databaseName,
-    user: "youngstars",
-    pass: "F7EdjaKzFb5cOEJh",
-    useNewUrlParser: true,
-    useCreateIndex: true,
-    useUnifiedTopology: true,
-  });
-
-  const connection = mongoose.connection;
-  connection.once("open", () => console.log("MongoDB connection established test..."));
-});
-
 const methods = {
   subscribe_to_channel: async () => {
     try {
       const response = await mockAxios.put(
         `${BASE_URL}/channels?${JSON.stringify({
-          email: "user@petsassist.com",
+          username: "user1",
         })}`,
         {
           subscribe_to: "Cat",
@@ -101,14 +84,14 @@ const add_subscription_mock = (user, channel) => {
   };
 };
 
-//test for successful request
-test("should return a success message object", async () => {
+//test for successful request to add a new channel
+test("should return a success message", async () => {
   
     const choices = ["Dog", "Cat", "Goat"];
     const acceptableFormats = ["application/json"]; //content-type mock
     mockAxios.put.mockImplementationOnce(async (url, body, config) => {
       //content type header check
-      try {
+      
       const content_type = config.headers;
       if (acceptableFormats[0] !== content_type["content-type"]) {
         return Promise.resolve({
@@ -127,8 +110,8 @@ test("should return a success message object", async () => {
       }
 
       //add channel to subscriptions list
-      const data = await add_subscription(
-        getParams(url),
+      const data = add_subscription_mock(
+        getParams(url).username,
         subscribe_to
       );
       // check if the mock request was successfull
@@ -144,26 +127,22 @@ test("should return a success message object", async () => {
         message: "success",
         data: data.update,
       };
-    }
-    catch(err){
-      return Promise.resolve({
-        error
-      })
-    }
+   
     });
 
   const data = await methods.subscribe_to_channel();
-  expect(data.message).toBe("success");
+  expect(data.message).toBe("success"); 
+
 });
 
-//test for failed update
-test("should return a success message object", async () => {
+// //test for anunsuccessful request to add a channel
+test("should return an error message", async () => {
   
   const choices = ["Dog", "Cat", "Goat"];
   const acceptableFormats = ["application/json"]; //content-type mock
   mockAxios.put.mockImplementationOnce(async (url, body, config) => {
     //content type header check
-    try {
+    
     const content_type = config.headers;
     if (acceptableFormats[0] !== content_type["content-type"]) {
       return Promise.resolve({
@@ -182,8 +161,8 @@ test("should return a success message object", async () => {
     }
 
     //add channel to subscriptions list
-    const data = await add_subscription(
-      getParams(url),
+    const data = add_subscription_mock(
+      getParams(url).username,
       subscribe_to
     );
     // check if the mock request was successfull
@@ -199,14 +178,10 @@ test("should return a success message object", async () => {
       message: "success",
       data: data.update,
     };
-  }
-  catch(err){
-    return Promise.resolve({
-      error
-    })
-  }
+ 
   });
 
 const data = await methods.subscribe_to_channel_fail();
-expect(data.message).toBe("error encountered");
+expect(data.message).toBe("error encountered"); 
+
 });
